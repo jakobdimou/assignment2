@@ -1,22 +1,32 @@
 #!/bin/bash
 
-
 tutorial() { #tutorial on what options to use and what they do
-    echo " invalid option!!!!"
-    echo "  type 4 to install packages"
-    echo "  type 9 to create symbolic links"
+    echo " $@ is not a valid option!!!!"
+    echo "   type "-4" to run the script to install packages"
+    echo "   type "-9" to run the script to create symbolic links"
+    echo "   e.g. sudo ./scriptrunner.sh -4"
     exit 1
 }
 
 while getopts "49" opt; do
     case "$opt" in
         4)
-            echo "Running the install packages script"
-            ./installpackages.sh
+            if [[ -f ./packageinstaller ]]; then
+                echo "Running the install packages script"
+                ./packageinstaller
+            else
+                echo "installpackages script not found"
+                exit 1
+            fi
             ;;
         9)
-            echo "Running the symbolic link creation script"
-            ./symboliclink.sh
+            if [[ -f ./symboliclink ]]; then
+                echo "Running the symbolic link creation script"
+                ./symboliclink
+            else
+                echo "symboliclink script not found"
+                exit 1
+            fi
             ;;
         *) 
             tutorial #for if the user types in an invalid option
