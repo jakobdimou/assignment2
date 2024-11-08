@@ -1,10 +1,12 @@
 #!/bin/bash
 
+#checks if the effective user ID is 0 (which is the root user), learned about this through man sudo
 if [[ $EUID -ne 0 ]]; then  
     echo "$0 is not running as root. Use sudo."
     exit 2
 fi
 
+#Sets the "USER_HOME" variable to home path of the user who is using sudo (the regular home path of the user). This is needed as I want to use the user's home path, even though I am executing this script with sudo privileges. I got this information from man sudo
 USER_HOME="/home/$SUDO_USER" 
 HOME=$USER_HOME
 
@@ -48,4 +50,3 @@ if [[ $? -eq 0 ]]; then #checks if the exit code of the function "symboliclink" 
     echo "All symbolic links successfully created!!"
 else
     echo "Symbolic linking unsuccessful."
-fi

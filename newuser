@@ -17,18 +17,16 @@ tutorial() {
     exit 1
 }
 
-PASSWORD=""
 ADDITIONAL_GROUPS=""
 USER=""
 SHELL=""
-E=""
 while getopts ":a:u:s:" opt; do 
     case "{$opt}" in
     a) 
     ADDITIONAL_GROUPS=$OPTARG
     ;;
     u) 
-    USERNAME=$OPTARG
+    USER=$OPTARG
     ;;
     s) 
     SHELL=$OPTARG
@@ -40,8 +38,8 @@ while getopts ":a:u:s:" opt; do
 done
 
 
-if [[ -n $USER ]]; then
-    useradd $USER -s $SHELL -d "~/assignment2" -g $USER
+if [[ -n $USER ]]; then #if the $USER variable has a value, then
+    useradd -s $SHELL -d "home/$USER" -g $USER $USER #-s to specify the shell, -d for home directory, -g to add a default primary group named after their user
 
     if [ $? -eq 0 ]; then #Checks what the exit status it to find errors. I copied this from the manual of useradd (man useradd).
     echo "Success"
@@ -64,7 +62,7 @@ if [[ -n $USER ]]; then
     elif [ $? -eq 14 ]; then
         echo "Can't update SELinux user mapping"
     fi
-
+fi
 
 if [[ -n $USER]]; then 
     passwd $USER 
