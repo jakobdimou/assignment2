@@ -12,11 +12,11 @@ USER_HOME="/home/$SUDO_USER"
 HOME=$USER_HOME
 
 
-#checks if the directory doesn't exist, and if it doesn't, then creates it
+#checks if the directory doesn't exist (! -d), and if it doesn't, then creates it
 if [[ ! -d ~/assignment2/project1 ]]; then 
     echo "Attempting to create directories: assignment2/project1"
     mkdir -p ~/assignment2/project1
-    if [[ $? -eq 0 ]]; then #checks if exit code of the recent command is 0 (success)
+    if [[ $? -eq 0 ]]; then #checks if exit code of the recent command is equal to 0 (success)
         echo "Exit code 0: Directories created successfully"
     else
         echo "Directory creation failed"
@@ -27,7 +27,7 @@ if [[ ! -d ~/assignment2/project1 ]]; then
 fi
 
 
-#checks if the "packages" file exists in the specified path and if it does then checks if that file has the correct list. If the list is correct, the user can choose to install or not install the packages. If the list is not correct then it is overwritten with the correct list.
+#checks if the "packages" file exists (-f) in the specified path and if it does then checks if that file has the correct list. If the list is correct, the user can choose to install or not install the packages. If the list is not correct then it is overwritten with the correct list.
 if [[ -f ~/assignment2/project1/packages ]]; then 
     echo "Package list has been found, now checking to see if the list is correct."
     if [[ $(cat ~/assignment2/project1/packages) != $packagelist ]]; then
@@ -68,7 +68,7 @@ $packagelist
 EOF
     if [[ $? -eq 0 ]]; then
         echo "Exit code: 0, Package list created successfully"
-        pacman -S $(cat ~/assignment2/project1/packages)
+        pacman -S $(cat ~/assignment2/project1/packages) #installs the packages, using command substitution to read the contents of the packages file
     else
         echo "Package list creation failed"
         exit 1

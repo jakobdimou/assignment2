@@ -1,7 +1,10 @@
+# USER_HOME=/HOME/$SUDO_USE0
+#     USER_HOME=$HOME
+#     echo "Changing to user home instead of root"
 #!/bin/bash
 
 symboliclink() {
-    if [[ ! -h ~/bin ]]; then #checking if the files exists and if it is a symbolic link. if it doesnt, then it creates. found from man test
+    if [[ ! -h ~/bin ]]; then #checking if the files exists and if it is a symbolic link with -h (same as -L). if it doesnt, then it creates. found from man test
     ln -s configfiles/bin ~/bin
     fi
     
@@ -11,10 +14,11 @@ symboliclink() {
 
     if [[ ! -h ~/.bashrc ]]; then
     ln -s configfiles/home/bashrc ~/.bashrc
+    fi
 }
 
 symboliclink
-if [[ $? -eq 0]]; then
+if [[ $? -eq 0 ]]; then
     echo "Symbolic links successfully created!!"
 else
     echo "Symbolic linking unsuccessful."
