@@ -14,7 +14,7 @@ USER_HOME="/home/$SUDO_USER"
 HOME=$USER_HOME
 
 
-create_directory() {
+
     #checks if the directory doesn't exist, and if it doesn't, then creates it
     if [[ ! -d ~/assignment2/project1 ]]; then 
         echo "Attempting to create directories: assignment2/project1"
@@ -28,12 +28,12 @@ create_directory() {
         else 
             echo "The directories already exist"
     fi
-}
+
 
 
 
 #checks if the "packages" file exists in the specified path and if it does then checks if that file has the correct list. If the list is correct, the user can choose to install or not install the packages. If the list is not correct then it is overwritten with the correct list.
-overwrite_or_install_packages() {
+
     if [[ -f ~/assignment2/project1/packages ]]; then 
         echo "Package list has been found, now checking to see if the list is correct."
         if [[ $(cat ~/assignment2/project1/packages) != $packagelist ]]; then
@@ -50,7 +50,7 @@ EOF
             fi
         else
             echo "Package list exists and is correct!!! everything should be installed already"
-            read -p "However, would you like to install the packages again? [Y/n]: " character #this is for if the user didn't want to install the packages the first time, but the directory and file exists. they can choose to download.
+            read -p "However, would you like to install the packages anyways? [Y/n]: " character #this is for if the user didn't want to install the packages the first time, but the directory and file exists. they can choose to download.
             case "$character" in
                 Y|y)
                     echo "installing the packages..."
@@ -65,8 +65,8 @@ EOF
             esac     
         fi
     fi
-}
-create_and_install_packages() {
+
+
 #this checks if the packages file does not exist
     if [[ ! -f ~/assignment2/project1/packages ]]; then
         echo "Package list not found. Attempting to create the package list and install packages."
@@ -81,22 +81,3 @@ EOF
             exit 1
         fi
     fi
-}
-
-
-while getopts ":abc" opt; do
-    case $opt in
-        a)
-            create_directory
-            ;;
-        b)
-            overwrite_or_install_packages
-            ;;
-        c)
-            create_and_install_packages
-            ;;
-        ?)
-            echo "Invalid option: '$OPTARG', please type a, b, or c"
-            ;;
-    esac
-done
