@@ -1,10 +1,20 @@
 #!/bin/bash
 
+if [[ $EUID -ne 0 ]]; then  
+    echo "$0 is not running as root. Use sudo."
+    exit 2
+fi
+
+USER_HOME="/home/$SUDO_USER" 
+HOME=$USER_HOME
+
 symboliclink() {
-    if [[ ! -h ~/bin ]]; then #checking if the files exists and if it is a symbolic link. if it doesnt, then it creates. found from man test
-    ln -sf ~/assignment2/project1/configfiles/bin ~/bin
-        if [[ $? -eq 0 ]];
-        then
+    rm -rf ~/bin #removes bin, config, and bashrc just in case they exist
+    rm -rf ~/.config
+    rm -rf ~/.bashrc
+    if [[ ! -h ~/bin ]]; then #checking if the files exists and if it is a symbolic link (using -h which is the same as -L). if it doesnt, then it creates. found from man test
+        ln -s ~/assignment2/project1/configfiles/bin ~/bin 
+        if [[ $? -eq 0 ]]; then
             echo "bin symbolic link created"
         else
             echo "bin symbolic link creation failed"
@@ -13,9 +23,8 @@ symboliclink() {
     fi
     
     if [[ ! -L ~/.config ]]; then
-    ln -sf ~/assignment2/project1/configfiles/config ~/.config
-            if [[ $? -eq 0 ]];
-        then
+        ln -s ~/assignment2/project1/configfiles/config ~/.config
+        if [[ $? -eq 0 ]]; then
             echo "config symbolic link created"
         else
             echo "config symbolic link creation failed"
@@ -24,9 +33,8 @@ symboliclink() {
     fi
 
     if [[ ! -h ~/.bashrc ]]; then
-    ln -sf ~/assignment2/project1/configfiles/home/bashrc ~/.bashrc
-            if [[ $? -eq 0 ]];
-        then
+        ln -s ~/assignment2/project1/configfiles/home ~/.bashrc
+        if [[ $? -eq 0 ]]; then
             echo "bashrc symbolic link created"
         else
             echo "bashrc symbolic link creation failed"
