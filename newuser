@@ -10,25 +10,20 @@ HOME=$USER_HOME
 
 tutorial() {
     echo " '$@' is not a valid option!!!!"
-    echo "   type '-p <password>' to set the password"
     echo "   type '-a' <groupname> to set additional groups"
-    echo "   type '-u' <username> to set the username"
+    echo "   type '-u' <user> to set the username"
     echo "   type '-s' <shell> to set the shell"
-    echo "   typing '-e' <idk> does nothing, I just wanted it to spell out 'pause'"
-    echo "   e.g. sudo ./newuser -p orewastrikerda123 -a bluelock -u isagiyoichi -s /bin/bash -e bruh"
+    echo "   e.g. sudo ./newuser -a bluelock -u isagiyoichi -s /bin/bash"
     exit 1
 }
 
 PASSWORD=""
 ADDITIONAL_GROUPS=""
-USERNAME=""
+USER=""
 SHELL=""
 E=""
-while getopts ":p:a:u:s:e:" opt; do
+while getopts ":a:u:s:" opt; do 
     case "{$opt}" in
-    p) 
-    PASSWORD=$OPTARG
-    ;;
     a) 
     ADDITIONAL_GROUPS=$OPTARG
     ;;
@@ -38,11 +33,55 @@ while getopts ":p:a:u:s:e:" opt; do
     s) 
     SHELL=$OPTARG
     ;;
-    e) 
-    E=$OPTARG
-    ;;
     *) 
     tutorial
     ;;
     esac
 done
+
+
+if [[ -n $USER ]]; then
+    useradd $USER -s $SHELL -d "~/assignment2" -g $USER
+
+    if [ $? -eq 0 ]; then #Checks what the exit status it to find errors. I copied this from the manual of useradd (man useradd).
+    echo "Success"
+    elif [ $? -eq 1 ]; then
+        echo "Can't update password file"
+    elif [ $? -eq 2 ]; then
+        echo "Invalid command syntax"
+    elif [ $? -eq 3 ]; then
+        echo "Invalid argument to option"
+    elif [ $? -eq 4 ]; then
+        echo "UID already in use (and no -o)"
+    elif [ $? -eq 6 ]; then
+        echo "Specified group doesn't exist"
+    elif [ $? -eq 9 ]; then
+        echo "Username or group name already in use"
+    elif [ $? -eq 10 ]; then
+        echo "Can't update group file"
+    elif [ $? -eq 12 ]; then
+        echo "Can't create home directory"
+    elif [ $? -eq 14 ]; then
+        echo "Can't update SELinux user mapping"
+    fi
+
+
+if [[ -n $USER]]; then 
+    passwd $USER 
+
+    if [ $? -eq 0 ]; then  #Checks what the exit status it to find errors. I copied this from the manual of passwd (man passwd).
+    echo "Success"
+    elif [ $? -eq 1 ]; then
+        echo "Permission denied"
+    elif [ $? -eq 2 ]; then
+        echo "Invalid combination of options"
+    elif [ $? -eq 3 ]; then
+        echo "Unexpected failure, nothing done"
+    elif [ $? -eq 4 ]; then
+        echo "Unexpected failure, passwd file missing"
+    elif [ $? -eq 5 ]; then
+        echo "Passwd file busy, try again"
+    elif [ $? -eq 6 ]; then
+        echo "Invalid argument to option"
+    fi
+fi
