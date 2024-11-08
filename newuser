@@ -39,11 +39,40 @@ done
 
 
 if [[ -n $USER ]]; then #if the $USER variable has a value, then
-    useradd -s $SHELL -d "home/$USER" -g $USER $USER #-s to specify the shell, -d for home directory, -g to add a default primary group named after their user
+    useradd -s $SHELL -d "/home/$USER" -g $USER $USER #-s to specify the shell, -d for home directory, -g to add a default primary group named after their user
 
-    if [ $? -eq 0 ]; then #Checks what the exit status it to find errors. I copied this from the manual of useradd (man useradd).
-    echo "Success"
-    elif [ $? -eq 1 ]; then
+    if [ $? -eq 0 ]; then 
+    echo "Successfully created user"
+    cp -r /etc/skel /home/$USER #cp is for copy and the -r is to specify to copy a directory recursively which will also copy all content. found from man cp
+
+        if [[ -n $ADDITIONAL_GROUPS ]]; then
+            usermod -aG $ADDITIONAL_GROUPS $USER #usermod modifies the user and -aG is for adding to a group, which is then followed by the additional groups and username the user input through getopts
+        fi
+        PASSWD
+    else
+    USERADD_ERROR_HANDLING
+    fi
+fi
+
+
+
+
+PASSWD() {
+    if [[ -n $USER]]; then 
+        echo "Enter password here"
+        passwd $USER 
+
+        if [ $? -eq 0 ]; then  
+        echo "Successfullt set password"
+
+        else
+        PASSWD_ERROR_HANDLING
+        fi
+    fi
+}
+
+USERADD_ERROR_HANDLING() {
+    if [ $? -eq 1 ]; then #Checks what the exit status it to find errors. I copied this from the manual of useradd (man useradd).
         echo "Can't update password file"
     elif [ $? -eq 2 ]; then
         echo "Invalid command syntax"
@@ -62,14 +91,10 @@ if [[ -n $USER ]]; then #if the $USER variable has a value, then
     elif [ $? -eq 14 ]; then
         echo "Can't update SELinux user mapping"
     fi
-fi
+}
 
-if [[ -n $USER]]; then 
-    passwd $USER 
-
-    if [ $? -eq 0 ]; then  #Checks what the exit status it to find errors. I copied this from the manual of passwd (man passwd).
-    echo "Success"
-    elif [ $? -eq 1 ]; then
+PASSWD_ERROR_HANDLING() {
+    if [ $? -eq 1 ]; then #Checks what the exit status it to find errors. I copied this from the manual of passwd (man passwd).
         echo "Permission denied"
     elif [ $? -eq 2 ]; then
         echo "Invalid combination of options"
@@ -82,4 +107,4 @@ if [[ -n $USER]]; then
     elif [ $? -eq 6 ]; then
         echo "Invalid argument to option"
     fi
-fi
+}
