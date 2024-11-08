@@ -48,7 +48,7 @@ EOF
         fi
     else
         echo "Package list exists and is correct!!! everything should be installed already"
-        read -p "However, would you like to install the packages again? [Y/n]: " character
+        read -p "However, would you like to install the packages again? [Y/n]: " character #this is for if the user didn't want to install the packages the first time, but the directory and file exists. they can choose to download.
         case "$character" in
             Y|y)
                 echo "installing the packages..."
