@@ -1,8 +1,4 @@
 packagelist=" kakoune tmux neovim git"
-# USER_HOME=/HOME/$SUDO_USER
-#     USER_HOME=$HOME
-#     echo "Changing to user home instead of root"
-
 
 #checks if the effective user ID is 0 (which is the root user), learned about this through man sudo
 if [[ $EUID -ne 0 ]]; then  
