@@ -1,25 +1,43 @@
-# USER_HOME=/HOME/$SUDO_USE0
-#     USER_HOME=$HOME
-#     echo "Changing to user home instead of root"
 #!/bin/bash
 
 symboliclink() {
-    if [[ ! -h ~/bin ]]; then #checking if the files exists and if it is a symbolic link with -h (same as -L). if it doesnt, then it creates. found from man test
-    ln -s configfiles/bin ~/bin
+    if [[ ! -h ~/bin ]]; then #checking if the files exists and if it is a symbolic link. if it doesnt, then it creates. found from man test
+    ln -sf ~/assignment2/project1/configfiles/bin ~/bin
+        if [[ $? -eq 0 ]];
+        then
+            echo "bin symbolic link created"
+        else
+            echo "bin symbolic link creation failed"
+            exit 1
+        fi
     fi
     
     if [[ ! -L ~/.config ]]; then
-    ln -s configfiles/config ~/.config
+    ln -sf ~/assignment2/project1/configfiles/config ~/.config
+            if [[ $? -eq 0 ]];
+        then
+            echo "config symbolic link created"
+        else
+            echo "config symbolic link creation failed"
+            exit 1
+        fi
     fi
 
     if [[ ! -h ~/.bashrc ]]; then
-    ln -s configfiles/home/bashrc ~/.bashrc
+    ln -sf ~/assignment2/project1/configfiles/home/bashrc ~/.bashrc
+            if [[ $? -eq 0 ]];
+        then
+            echo "bashrc symbolic link created"
+        else
+            echo "bashrc symbolic link creation failed"
+            exit 1
+        fi
     fi
 }
 
-symboliclink
-if [[ $? -eq 0 ]]; then
-    echo "Symbolic links successfully created!!"
+symboliclink #calls the function 
+if [[ $? -eq 0 ]]; then #checks if the exit code of the function "symboliclink" is 0 (success)
+    echo "All symbolic links successfully created!!"
 else
     echo "Symbolic linking unsuccessful."
 fi
