@@ -22,7 +22,7 @@ symboliclink() {
         fi
     fi
     
-    if [[ ! -L ~/.config ]]; then
+    if [[ ! -L ~/.config ]]; then #same as above but for config
         ln -s ~/assignment2/project1/configfiles/config ~/.config
         if [[ $? -eq 0 ]]; then
             echo "config symbolic link created"
@@ -32,7 +32,7 @@ symboliclink() {
         fi
     fi
 
-    if [[ ! -h ~/.bashrc ]]; then
+    if [[ ! -h ~/.bashrc ]]; then #same as above but for bashrc
         ln -s ~/assignment2/project1/configfiles/home ~/.bashrc
         if [[ $? -eq 0 ]]; then
             echo "bashrc symbolic link created"
