@@ -1,0 +1,48 @@
+#!/bin/bash
+
+if [[ $EUID -ne 0 ]]; then  
+    echo "$0 is not running as root. Use sudo."
+    exit 2
+fi
+
+USER_HOME="/home/$SUDO_USER" 
+HOME=$USER_HOME
+
+tutorial() {
+    echo " '$@' is not a valid option!!!!"
+    echo "   type '-p <password>' to set the password"
+    echo "   type '-a' <groupname> to set additional groups"
+    echo "   type '-u' <username> to set the username"
+    echo "   type '-s' <shell> to set the shell"
+    echo "   typing '-e' <idk> does nothing, I just wanted it to spell out 'pause'"
+    echo "   e.g. sudo ./newuser -p orewastrikerda123 -a bluelock -u isagiyoichi -s /bin/bash -e bruh"
+    exit 1
+}
+
+PASSWORD=""
+ADDITIONAL_GROUPS=""
+USERNAME=""
+SHELL=""
+E=""
+while getopts ":p:a:u:s:e:" opt; do
+    case "{$opt}" in
+    p) 
+    PASSWORD=$OPTARG
+    ;;
+    a) 
+    ADDITIONAL_GROUPS=$OPTARG
+    ;;
+    u) 
+    USERNAME=$OPTARG
+    ;;
+    s) 
+    SHELL=$OPTARG
+    ;;
+    e) 
+    E=$OPTARG
+    ;;
+    *) 
+    tutorial
+    ;;
+    esac
+done
