@@ -9,7 +9,7 @@ USER_HOME="/home/$SUDO_USER"
 HOME=$USER_HOME
 
 tutorial() {
-    echo " '$@' is not a valid option!!!!"
+    echo "   Please try again"
     echo "   type '-a' <groupname> to set additional groups"
     echo "   type '-u' <user> to set the username"
     echo "   type '-s' <shell> to set the shell"
@@ -17,48 +17,8 @@ tutorial() {
     exit 1
 }
 
-ADDITIONAL_GROUPS=""
-USER=""
-SHELL=""
-while getopts ":a:u:s:" opt; do 
-    case "{$opt}" in
-    a) 
-    ADDITIONAL_GROUPS=$OPTARG
-    ;;
-    u) 
-    USER=$OPTARG
-    ;;
-    s) 
-    SHELL=$OPTARG
-    ;;
-    *) 
-    tutorial
-    ;;
-    esac
-done
-
-
-if [[ -n $USER ]]; then #if the $USER variable has a value, then
-    useradd -s $SHELL -d "/home/$USER" -g $USER $USER #-s to specify the shell, -d for home directory, -g to add a default primary group named after their user
-
-    if [ $? -eq 0 ]; then 
-    echo "Successfully created user"
-    cp -r /etc/skel /home/$USER #cp is for copy and the -r is to specify to copy a directory recursively which will also copy all content. found from man cp
-
-        if [[ -n $ADDITIONAL_GROUPS ]]; then
-            usermod -aG $ADDITIONAL_GROUPS $USER #usermod modifies the user and -aG is for adding to a group, which is then followed by the additional groups and username the user input through getopts
-        fi
-        PASSWD
-    else
-    USERADD_ERROR_HANDLING
-    fi
-fi
-
-
-
-
 PASSWD() {
-    if [[ -n $USER]]; then 
+    if [[ -n $USER ]]; then 
         echo "Enter password here"
         passwd $USER 
 
@@ -108,3 +68,42 @@ PASSWD_ERROR_HANDLING() {
         echo "Invalid argument to option"
     fi
 }
+
+ADDITIONAL_GROUPS=""
+USER=""
+SHELL=""
+
+    while getopts ":a:u:s:" opt; do 
+        case "${opt}" in
+        a) 
+        ADDITIONAL_GROUPS=$OPTARG
+        ;;
+        u) 
+        USER=$OPTARG
+        ;;
+        s) 
+        SHELL=$OPTARG
+        ;;
+        *) 
+        tutorial
+        ;;
+        esac
+    done
+
+
+
+if [[ -n $USER ]]; then #if the $USER variable has a value, then
+    useradd -s $SHELL -d "/home/$USER" -g $USER $USER #-s to specify the shell, -d for home directory, -g to add a default primary group named after their user
+
+    if [ $? -eq 0 ]; then 
+    echo "Successfully created user"
+    cp -r /etc/skel. /home/$USER #cp is for copy and the -r is to specify to copy a directory recursively which will also copy all content. found from man cp
+
+        if [[ -n $ADDITIONAL_GROUPS ]]; then
+            usermod -aG $ADDITIONAL_GROUPS $USER #usermod modifies the user and -aG is for adding to a group, which is then followed by the additional groups and username the user input through getopts
+        fi
+        PASSWD
+    else
+    USERADD_ERROR_HANDLING
+    fi
+fi
