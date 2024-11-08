@@ -19,14 +19,13 @@ tutorial() {
 
 PASSWD() {
     if [[ -n $USER ]]; then 
-        echo "Enter password here"
         passwd $USER 
 
         if [ $? -eq 0 ]; then  
-        echo "Successfullt set password"
+        echo "Successful creation of password"
 
         else
-        PASSWD_ERROR_HANDLING
+            PASSWD_ERROR_HANDLING
         fi
     fi
 }
@@ -91,17 +90,19 @@ SHELL=""
     done
 
 
-
 if [[ -n $USER ]]; then #if the $USER variable has a value, then
-    useradd -s $SHELL -d "/home/$USER" -g $USER $USER #-s to specify the shell, -d for home directory, -g to add a default primary group named after their user
+    useradd -s $SHELL -d "/home/$USER" -U $USER #-s to specify the shell, -d for home directory, -U to add a group named after the user. found from man useradd
 
     if [ $? -eq 0 ]; then 
     echo "Successfully created user"
-    cp -r /etc/skel. /home/$USER #cp is for copy and the -r is to specify to copy a directory recursively which will also copy all content. found from man cp
+    cp -r /etc/skel /home/$USER #cp is for copy and the -r is to specify to copy a directory recursively which will also copy all content. found from man cp
 
-        if [[ -n $ADDITIONAL_GROUPS ]]; then
-            usermod -aG $ADDITIONAL_GROUPS $USER #usermod modifies the user and -aG is for adding to a group, which is then followed by the additional groups and username the user input through getopts
+        if ! grep "$ADDITIONAL_GROUPS:" /etc/group; then
+                groupadd $ADDITIONAL_GROUPS
         fi
+
+        usermod -aG $ADDITIONAL_GROUPS $USER #usermod modifies the user and -aG is for adding to a group, which is then followed by the additional groups and username the user input through getopts
+
         PASSWD
     else
     USERADD_ERROR_HANDLING
