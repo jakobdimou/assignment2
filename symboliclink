@@ -1,0 +1,21 @@
+#!/bin/bash
+
+symboliclink() {
+    if [[ ! -h ~/bin ]]; then #checking if the files exists and if it is a symbolic link. if it doesnt, then it creates. found from man test
+    ln -s configfiles/bin ~/bin
+    fi
+    
+    if [[ ! -L ~/.config ]]; then
+    ln -s configfiles/config ~/.config
+    fi
+
+    if [[ ! -h ~/.bashrc ]]; then
+    ln -s configfiles/home/bashrc ~/.bashrc
+}
+
+symboliclink
+if [[ $? -eq 0]]; then
+    echo "Symbolic links successfully created!!"
+else
+    echo "Symbolic linking unsuccessful."
+fi
