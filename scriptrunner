@@ -1,0 +1,30 @@
+#!/bin/bash
+
+
+tutorial() { #tutorial on what options to use and what they do
+    echo " invalid option!!!!"
+    echo "  type 4 to install packages"
+    echo "  type 9 to create symbolic links"
+    exit 1
+}
+
+while getopts "49" opt; do
+    case "$opt" in
+        4)
+            echo "Running the install packages script"
+            ./installpackages.sh
+            ;;
+        9)
+            echo "Running the symbolic link creation script"
+            ./symboliclink.sh
+            ;;
+        *) 
+            tutorial #for if the user types in an invalid option
+            ;;
+    esac
+done
+
+#if the user does not type in any options (OPTIND is default 1 so this runs if no options are given)
+if [ $OPTIND -eq 1 ]; then 
+    tutorial
+fi
