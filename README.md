@@ -10,7 +10,7 @@ Creates a new user with specified options.
 ### Example usage:
 ```
 sudo newuser -a <groupname> -u <username> -s <shell>
-sudo newuser -a bluelock -u itoshi-rin -s /bin/bash
+sudo newuser -a blue-lock -u itoshi-rin -s /bin/bash
 ```
 
 ## `installpackages`
