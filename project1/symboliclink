@@ -1,0 +1,52 @@
+#!/bin/bash
+
+#checks if the effective user ID is 0 (which is the root user), learned about this through man sudo
+if [[ $EUID -ne 0 ]]; then  
+    echo "$0 is not running as root. Use sudo."
+    exit 2
+fi
+
+#Sets the "USER_HOME" variable to home path of the user who is using sudo (the regular home path of the user). This is needed as I want to use the user's home path, even though I am executing this script with sudo privileges. I got this information from man sudo
+USER_HOME="/home/$SUDO_USER" 
+HOME=$USER_HOME
+
+symboliclink() {
+    rm -rf ~/bin #removes bin, config, and bashrc just in case they exist
+    rm -rf ~/.config
+    rm -rf ~/.bashrc
+    if [[ ! -h ~/bin ]]; then #checking if the files exists and if it is a symbolic link (using -h which is the same as -L). if it doesnt, then it creates. found from man test
+        ln -s ~/assignment2/project1/configfiles/bin ~/bin 
+        if [[ $? -eq 0 ]]; then
+            echo "bin symbolic link created"
+        else
+            echo "bin symbolic link creation failed"
+            exit 1
+        fi
+    fi
+    
+    if [[ ! -L ~/.config ]]; then #same as above but for config
+        ln -s ~/assignment2/project1/configfiles/config ~/.config
+        if [[ $? -eq 0 ]]; then
+            echo "config symbolic link created"
+        else
+            echo "config symbolic link creation failed"
+            exit 1
+        fi
+    fi
+
+    if [[ ! -h ~/.bashrc ]]; then #same as above but for bashrc
+        ln -s ~/assignment2/project1/configfiles/home ~/.bashrc
+        if [[ $? -eq 0 ]]; then
+            echo "bashrc symbolic link created"
+        else
+            echo "bashrc symbolic link creation failed"
+            exit 1
+        fi
+    fi
+}
+
+symboliclink #calls the function 
+if [[ $? -eq 0 ]]; then #checks if the exit code of the function "symboliclink" is 0 (success)
+    echo "All symbolic links successfully created!!"
+else
+    echo "Symbolic linking unsuccessful."

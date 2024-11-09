@@ -1,0 +1,83 @@
+#!/bin/bash
+
+packagelist=" kakoune tmux neovim git"
+
+#checks if the effective user ID is 0 (which is the root user), learned about this through man sudo
+if [[ $EUID -ne 0 ]]; then  
+    echo "$0 is not running as root. Use sudo."
+    exit 2
+fi
+
+
+#Sets the "USER_HOME" variable to home path of the user who is using sudo (the regular home path of the user). This is needed as I want to use the user's home path, even though I am executing this script with sudo privileges. I got this information from man sudo
+USER_HOME="/home/$SUDO_USER" 
+HOME=$USER_HOME
+
+
+
+    #checks if the directory doesn't exist, and if it doesn't, then creates it
+    if [[ ! -d ~/assignment2/project1 ]]; then 
+        echo "Attempting to create directories: assignment2/project1"
+        mkdir -p ~/assignment2/project1
+        if [[ $? -eq 0 ]]; then #checks if exit code of the recent command is 0 (success)
+            echo "Exit code 0: Directories created successfully"
+        else
+            echo "Directory creation failed"
+            exit 1
+        fi
+        else 
+            echo "The directories already exist"
+    fi
+
+
+
+
+#checks if the "packages" file exists in the specified path and if it does then checks if that file has the correct list. If the list is correct, the user can choose to install or not install the packages. If the list is not correct then it is overwritten with the correct list.
+
+    if [[ -f ~/assignment2/project1/packages ]]; then 
+        echo "Package list has been found, now checking to see if the list is correct."
+        if [[ $(cat ~/assignment2/project1/packages) != $packagelist ]]; then #uses command substitution and cat to read the package list file and compares it to the correct list
+            echo "Package list is incorrect...overwriting the correct list to the file."
+            cat > ~/assignment2/project1/packages <<- EOF
+    $packagelist
+EOF
+            if [[ $? -eq 0 ]]; then
+                echo "Overwrite successful"
+                pacman -S $(cat ~/assignment2/project1/packages) #installs the packages from the file
+            else 
+                echo "Overwriting package list did not work"
+                exit 1
+            fi
+        else
+            echo "Package list exists and is correct!!! everything should be installed already"
+            read -p "However, would you like to install the packages again? [Y/n]: " character #this is for if the user didn't want to install the packages the first time, but the directory and file exists. they can choose to download.
+            case "$character" in
+                Y|y)
+                    echo "installing the packages..."
+                    pacman -S $packagelist
+                    ;;
+                N|n)
+                    echo "ok.."
+                    ;;
+                *)
+                    echo "you did not enter y or n"
+                    ;;
+            esac     
+        fi
+    fi
+
+
+#this checks if the packages file does not exist
+    if [[ ! -f ~/assignment2/project1/packages ]]; then
+        echo "Package list not found. Attempting to create the package list and install packages."
+        cat > ~/assignment2/project1/packages <<- EOF 
+    $packagelist
+EOF
+        if [[ $? -eq 0 ]]; then
+            echo "Exit code: 0, Package list created successfully"
+            pacman -S $(cat ~/assignment2/project1/packages)
+        else
+            echo "Package list creation failed"
+            exit 1
+        fi
+    fi

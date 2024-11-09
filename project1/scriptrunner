@@ -1,0 +1,40 @@
+#!/bin/bash
+
+tutorial() { #tutorial on what options to use and what they do
+    echo " '$@' is not a valid option!!!!"
+    echo "   type "-4" to run the script to install packages"
+    echo "   type "-9" to run the script to create symbolic links"
+    echo "   e.g. sudo ./scriptrunner -4"
+    exit 1
+}
+
+while getopts "49" opt; do #getopts is used to get the options from the user. 4 and 9 are the options that the user can type in
+    case "$opt" in
+        4)
+            if [[ -f ./packageinstaller ]]; then #checks if the file exists then runs the script
+                echo "Running the install packages script"
+                ./packageinstaller
+            else
+                echo "installpackages script not found"
+                exit 1
+            fi
+            ;;
+        9)
+            if [[ -f ./symboliclink ]]; then #checks if the file exists then runs the script
+                echo "Running the symbolic link creation script"
+                ./symboliclink
+            else
+                echo "symboliclink script not found"
+                exit 1
+            fi
+            ;;
+        *) 
+            tutorial #for if the user types in an invalid option
+            ;;
+    esac
+done
+
+#if the user does not type in any options (OPTIND is default 1 so this runs if no options are given)
+if [ $OPTIND -eq 1 ]; then 
+    tutorial
+fi
