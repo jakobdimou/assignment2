@@ -23,7 +23,7 @@ sudo installpackages
 ## `symboliclink`
 Creates symbolic links for `bin`, `config`, and `bashrc`.
 
-### Usage
+### Example usage:
 ```
 sudo symboliclink
 ```
@@ -31,7 +31,7 @@ sudo symboliclink
 ## `scriptrunner`
 Runs either the package installation or symbolic link creation script.
 
-### Usage
+### Example usage:
 ```
 sudo scriptrunner -4
 ```
