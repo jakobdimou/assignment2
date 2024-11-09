@@ -77,6 +77,7 @@ fi
 
 NEW_UID="1000"
 GID="1000"
+ADDITIONAL_GID="1000"
 
 #gets the next available user id
 #uses cut and to get the third field of the passwd file (the user id), uses -f3. and -d specifies the delimiter (which is ":", it is used to seperate the fields in the user's information that is stored in /etc/passwd). found from man cut 
@@ -87,11 +88,14 @@ for uid in $(cut -f3 -d: /etc/passwd); do
 done
 
 
-for gid in $(cut -f3 -d: /etc/group); do #same as above but for the group ID (group id is in the fourth field of the group file, so -f4 instead) 
+for gid in $(cut -f3 -d: /etc/group); do #same as above but for the group ID 
     if [[ $gid -ge $GID ]]; then
         GID=$(( gid+1 ))
     fi
 done
+
+ADDITIONAL_GID=$(( GID + 1 )) #adds 1 to the group ID for the additional group, to make it different
+
 
 #add user to the to a primary group named after themselves
 cat >> /etc/group <<- EOF
@@ -110,17 +114,18 @@ cp -r /etc/skel/ "/home/$USER/" #-r is for copying a directory recursively, whic
 chown -R $USER:$USER "/home/$USER" #like above but for changing the owner of the directory. found from man chown
 
 
-
 #if the user added an additional group in getopts, then it adds the user to the group
 if [[ -n $ADDITIONAL_GROUPS ]]; then 
+
+
     if grep "^$ADDITIONAL_GROUPS:" /etc/group; then #^ is used because I only want the beginning of the line in /etc/group which is the group name
 
     # s substitutes anything after the group name (so this is needed if there are already users in the group) and $ is used to indicate the end of the line. 
-        sed "/^$ADDITIONAL_GROUPS:/s/$/$USER/" /etc/group 
+        sed -i "/^$ADDITIONAL_GROUPS:/s/$/,$USER/" /etc/group 
 
     else
         cat >> /etc/group <<- EOF #creates the group if it doesn't exist
-$ADDITIONAL_GROUPS:x:$GID:$USER
+$ADDITIONAL_GROUPS:x:$ADDITIONAL_GID:$USER
 EOF
     fi
 fi
