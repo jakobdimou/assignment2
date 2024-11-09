@@ -9,8 +9,8 @@ Creates a new user with specified options.
 
 ### Example usage:
 ```
-sudo newuser -a <groupname> -u <username> -s <shell>
-sudo newuser -a blue-lock -u itoshi-rin -s /bin/bash
+sudo ./newuser -a <groupname> -u <username> -s <shell>
+sudo ./newuser -a blue-lock -u itoshi-rin -s /bin/bash
 ```
 
 ## `installpackages`
@@ -18,7 +18,7 @@ Installs a predefined list of packages.
 
 ### Example usage:
 ```
-sudo installpackages
+sudo ./installpackages
 ```
 
 ## `symboliclink`
@@ -26,7 +26,7 @@ Creates symbolic links for `bin`, `config`, and `bashrc`.
 
 ### Example usage:
 ```
-sudo symboliclink
+sudo ./symboliclink
 ```
 
 ## `scriptrunner`
@@ -34,7 +34,7 @@ Runs either the package installation or symbolic link creation script.
 
 ### Example usage:
 ```
-sudo scriptrunner -4
+sudo ./scriptrunner -4
 ```
 
 ### Options
