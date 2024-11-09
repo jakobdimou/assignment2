@@ -8,6 +8,7 @@ fi
 USER_HOME="/home/$SUDO_USER" 
 HOME=$USER_HOME
 
+
 tutorial() {
     echo "   Please try again"
     echo "   type '-a' <groupname> to set additional groups"
@@ -22,7 +23,7 @@ PASSWD() {
         passwd $USER 
 
         if [ $? -eq 0 ]; then  
-        echo "Successful creation of password"
+        echo "yippee"
 
         else
             PASSWD_ERROR_HANDLING
@@ -30,27 +31,6 @@ PASSWD() {
     fi
 }
 
-USERADD_ERROR_HANDLING() {
-    if [ $? -eq 1 ]; then #Checks what the exit status it to find errors. I copied this from the manual of useradd (man useradd).
-        echo "Can't update password file"
-    elif [ $? -eq 2 ]; then
-        echo "Invalid command syntax"
-    elif [ $? -eq 3 ]; then
-        echo "Invalid argument to option"
-    elif [ $? -eq 4 ]; then
-        echo "UID already in use (and no -o)"
-    elif [ $? -eq 6 ]; then
-        echo "Specified group doesn't exist"
-    elif [ $? -eq 9 ]; then
-        echo "Username or group name already in use"
-    elif [ $? -eq 10 ]; then
-        echo "Can't update group file"
-    elif [ $? -eq 12 ]; then
-        echo "Can't create home directory"
-    elif [ $? -eq 14 ]; then
-        echo "Can't update SELinux user mapping"
-    fi
-}
 
 PASSWD_ERROR_HANDLING() {
     if [ $? -eq 1 ]; then #Checks what the exit status it to find errors. I copied this from the manual of passwd (man passwd).
@@ -90,21 +70,55 @@ SHELL=""
     done
 
 
-if [[ -n $USER ]]; then #if the $USER variable has a value, then
-    useradd -s $SHELL -d "/home/$USER" -U $USER #-s to specify the shell, -d for home directory, -U to add a group named after the user. found from man useradd
+UID="1000"
+GID-"1000"
 
-    if [ $? -eq 0 ]; then 
-    echo "Successfully created user"
-    cp -r /etc/skel /home/$USER #cp is for copy and the -r is to specify to copy a directory recursively which will also copy all content. found from man cp
+#gets the next available user id
+#uses cut and to get the third field of the passwd file (the user id), uses -f3. and -d specifies the delimiter (which is ":", it is used to seperate the fields in the user's information that is stored in /etc/passwd). found from man cut 
+for uid in (cut -f3 -d: /etc/passwd); do 
+    if [[ $uid >= $UID ]]; then #compares the UID to the uid variable, if the UID is greater than or equal to the uid variable, then it adds to the UID by 1 (for a unique user ID)
+        UID=$(( uid+1 ))
+    fi
+done
 
-        if ! grep "$ADDITIONAL_GROUPS:" /etc/group; then
-                groupadd $ADDITIONAL_GROUPS
-        fi
 
-        usermod -aG $ADDITIONAL_GROUPS $USER #usermod modifies the user and -aG is for adding to a group, which is then followed by the additional groups and username the user input through getopts
+for gid in (cut -f4 -d: /etc/group); do #same as above but for the group ID (group id is in the fourth field of the group file, so -f4 instead) 
+    if [[ $gid >= $GID ]]; then
+        GID=$(( gid+1 ))
+    fi
+done
 
-        PASSWD
+#add user to the to a primary group named after themselves
+cat >> /etc/group <<- EOF
+    $USER:x:$GID:$USER
+EOF
+
+#appends the user information to /etc/passwd, the user information is the username, user id, group id, home directory, and shell. 
+cat >> /etc/passwd <<- EOF
+    $USER:x:$UID:$GID::/home/$USER:$SHELL
+EOF
+
+
+# Create the user's home directory and copies /etc/skel to the user's home directory
+mkdir -p "/home/$USER" #-p is for creating the parent directories
+cp -r /etc/skel/ "/home/$USER/" #-r is for copying a directory recursively, which will also copy all content. found from man cp
+
+
+
+
+#if the user added an additional group in getopts, then it adds the user to the group
+if [[ -n $ADDITIONAL_GROUPS ]]; then 
+    if grep "^$ADDITIONAL_GROUPS:" /etc/group; then #^ is used because I only want the beginning of the line in /etc/group which is the group name
+
+    # s substitutes anything after the group name (so this is needed if there are already users in the group) and $ is used to indicate the end of the line. 
+        sed "/^$ADDITIONAL_GROUPS:/s/$/$USER/" /etc/group 
+
     else
-    USERADD_ERROR_HANDLING
+        cat >> /etc/group <<- EOF #creates the group if it doesn't exist
+        ^$ADDITIONAL_GROUPS:x:$GID:$USER
+EOF
     fi
 fi
+
+#set the password for the user
+PASSWD
